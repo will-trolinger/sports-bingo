@@ -76,6 +76,7 @@ td {
   position: relative;
   aspect-ratio: 1 / 1;
   padding: 5px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 td.marked {
@@ -105,17 +106,19 @@ img {
     width: 100%;
     font-size: 1rem;
     margin: 0 0 4px 0;
+    padding: 14px 24px;
   }
   .bingo-container {
     gap: 12px;
   }
   td {
-    font-size: 0.8rem;
-    padding: 4px;
+    font-size: 0.7rem;
+    padding: 2px;
+    border-width: 1px;
   }
   img {
     max-width: 90%;
-    max-height: 50px;
+    max-height: 40px;
   }
 }
 </style>
@@ -317,8 +320,9 @@ function changeSport(sport) {
   currentSport = sport;
   localStorage.setItem('bingo_sport', sport);
 
-  document.getElementById('title').textContent =
-    sport.charAt(0).toUpperCase() + sport.slice(1) + ' Bingo';
+  const sportTitle = sport.charAt(0).toUpperCase() + sport.slice(1) + ' Bingo';
+  document.getElementById('title').textContent = sportTitle;
+  document.title = sportTitle;
 
   const { board, marks } = loadBoard(sport);
   renderBoard(board, marks);
@@ -332,8 +336,9 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('bingo_sport', sportParam);
   }
 
-  document.getElementById('title').textContent =
-    currentSport.charAt(0).toUpperCase() + currentSport.slice(1) + ' Bingo';
+  const sportTitle = currentSport.charAt(0).toUpperCase() + currentSport.slice(1) + ' Bingo';
+  document.getElementById('title').textContent = sportTitle;
+  document.title = sportTitle;
 
   const { board, marks } = loadBoard(currentSport);
   renderBoard(board, marks);
