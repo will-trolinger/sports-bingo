@@ -38,6 +38,3 @@ The workflow is configured in `.github/static.yml`.
 - Team logos from ESPN CDN
 - localStorage for persistence
 
-## License
-
-MIT
