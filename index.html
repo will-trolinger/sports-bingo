@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Baseball Bingo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+  --accent: #007BFF;
+  --accent-dark: #0056b3;
+  --bg: #f4f4f8;
+  --cell-bg: #ffffff;
+  --cell-marked: #a8e6a2;
+  --font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  margin: 0;
+  padding: 0 12px;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: #222;
+}
+
+.btn {
+  background-color: var(--accent);
+  color: white;
+  padding: 12px 24px;
+  margin: 4px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  display: inline-block;
+}
+
+.btn:hover {
+  background-color: var(--accent-dark);
+  transform: scale(1.03);
+}
+
+.bingo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  table-layout: fixed;
+}
+
+td {
+  border: 2px solid #333;
+  background-color: var(--cell-bg);
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  font-size: clamp(0.75rem, 3vw, 1rem);
+  transition: background-color 0.2s, transform 0.1s;
+  user-select: none;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  padding: 5px;
+}
+
+td.marked {
+  background-color: var(--cell-marked);
+}
+
+td[data-free="true"] {
+  pointer-events: none;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #444;
+}
+
+img {
+  max-width: 80%;
+  max-height: 60%;
+  display: block;
+  margin: 4px auto 3px;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+  .btn {
+    width: 100%;
+    font-size: 1rem;
+    margin: 0 0 4px 0;
+  }
+  .bingo-container {
+    gap: 12px;
+  }
+  td {
+    font-size: 0.8rem;
+    padding: 4px;
+  }
+  img {
+    max-width: 90%;
+    max-height: 50px;
+  }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+<h1 id="title">Baseball Bingo</h1>
+
+<div class="bingo-container">
+  <div style="text-align: center;">
+    <button class="btn" onclick="changeSport('baseball')">Baseball</button>
+    <button class="btn" onclick="changeSport('football')">Football</button>
+  </div>
+
+  <table id="bingo"></table>
+
+  <button class="btn" onclick="generateNewCard()">Generate New Card</button>
+</div>
+
+<script>
+const TEAMS = {
+  baseball: {
+    Yankees: "nyy", RedSox: "bos", BlueJays: "tor", Rays: "tb", Orioles: "bal",
+    WhiteSox: "cws", Guardians: "cle", Tigers: "det", Royals: "kc", Twins: "min",
+    Astros: "hou", Mariners: "sea", Angels: "laa", Rangers: "tex", Athletics: "oak",
+    Braves: "atl", Mets: "nym", Phillies: "phi", Marlins: "mia", Nationals: "wsh",
+    Cardinals: "stl", Brewers: "mil", Cubs: "chc", Pirates: "pit", Reds: "cin",
+    Dodgers: "lad", Padres: "sd", Giants: "sf", Rockies: "col", "D-Backs": "ari"
+  },
+  football: {
+    Patriots: "ne", Chiefs: "kc", Packers: "gb", Cowboys: "dal", Eagles: "phi",
+    Giants: "nyg", Jets: "nyj", "49ers": "sf", Rams: "lar", Seahawks: "sea",
+    Ravens: "bal", Bears: "chi", Steelers: "pit", Saints: "no", Vikings: "min",
+    Lions: "det", Dolphins: "mia", Bills: "buf", Texans: "hou", Titans: "ten",
+    Chargers: "lac", Colts: "ind", Bengals: "cin", Broncos: "den", Panthers: "car",
+    Jaguars: "jax", Raiders: "lv", Commanders: "wsh", Browns: "cle", Buccaneers: "tb",
+    Cardinals: "ari"
+  }
+};
+
+const LOGO_URLS = {
+  baseball: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/mlb/500/{code}.png",
+  football: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/{code}.png"
+};
+
+let currentSport = localStorage.getItem('bingo_sport') || 'baseball';
+
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function generateBoard(sport) {
+  const teams = Object.keys(TEAMS[sport]);
+  const selected = shuffle(teams).slice(0, 24);
+
+  const board = [];
+  let idx = 0;
+
+  for (let row = 0; row < 5; row++) {
+    const rowData = [];
+    for (let col = 0; col < 5; col++) {
+      if (row === 2 && col === 2) {
+        rowData.push({ name: "FREE", is_free: true });
+      } else {
+        rowData.push({ name: selected[idx], is_free: false });
+        idx++;
+      }
+    }
+    board.push(rowData);
+  }
+
+  return board;
+}
+
+function saveBoard(sport, board, marks) {
+  localStorage.setItem(`bingo_board_${sport}`, JSON.stringify(board));
+  localStorage.setItem(`bingo_marks_${sport}`, JSON.stringify(marks));
+}
+
+function loadBoard(sport) {
+  const boardData = localStorage.getItem(`bingo_board_${sport}`);
+  const marksData = localStorage.getItem(`bingo_marks_${sport}`);
+
+  if (boardData && marksData) {
+    return {
+      board: JSON.parse(boardData),
+      marks: new Set(JSON.parse(marksData))
+    };
+  }
+
+  const board = generateBoard(sport);
+  const marks = new Set(['2-2']);
+  saveBoard(sport, board, Array.from(marks));
+
+  return { board, marks };
+}
+
+function renderBoard(board, marks) {
+  const table = document.getElementById('bingo');
+  table.innerHTML = '';
+
+  board.forEach((row, rowIdx) => {
+    const tr = document.createElement('tr');
+
+    row.forEach((cell, colIdx) => {
+      const td = document.createElement('td');
+      const key = `${rowIdx}-${colIdx}`;
+
+      if (marks.has(key) || cell.is_free) {
+        td.classList.add('marked');
+      }
+
+      if (cell.is_free) {
+        td.dataset.free = 'true';
+        td.textContent = 'FREE';
+      } else {
+        const code = TEAMS[currentSport][cell.name];
+        const imgUrl = LOGO_URLS[currentSport].replace('{code}', code);
+
+        const img = document.createElement('img');
+        img.src = imgUrl;
+        img.alt = cell.name;
+
+        const div = document.createElement('div');
+        div.textContent = cell.name;
+
+        td.appendChild(img);
+        td.appendChild(div);
+
+        td.onclick = () => toggleMark(td, rowIdx, colIdx);
+      }
+
+      tr.appendChild(td);
+    });
+
+    table.appendChild(tr);
+  });
+}
+
+function toggleMark(cell, row, col) {
+  if (cell.dataset.free === 'true') return;
+
+  const key = `${row}-${col}`;
+  const marksData = localStorage.getItem(`bingo_marks_${currentSport}`);
+  const marks = new Set(JSON.parse(marksData));
+
+  if (marks.has(key)) {
+    marks.delete(key);
+    cell.classList.remove('marked');
+  } else {
+    marks.add(key);
+    cell.classList.add('marked');
+  }
+
+  localStorage.setItem(`bingo_marks_${currentSport}`, JSON.stringify(Array.from(marks)));
+
+  checkBingo();
+}
+
+function checkBingo() {
+  const table = document.getElementById('bingo');
+  const rows = Array.from(table.rows);
+
+  const isMarked = (r, c) =>
+    rows[r] && rows[r].cells[c] && rows[r].cells[c].classList.contains('marked');
+
+  const bingo = () => {
+    for (let i = 0; i < 5; i++) {
+      if ([0, 1, 2, 3, 4].every(j => isMarked(i, j))) return true;
+      if ([0, 1, 2, 3, 4].every(j => isMarked(j, i))) return true;
+    }
+    if ([0, 1, 2, 3, 4].every(i => isMarked(i, i))) return true;
+    if ([0, 1, 2, 3, 4].every(i => isMarked(i, 4 - i))) return true;
+    return false;
+  };
+
+  if (bingo()) {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
+}
+
+function generateNewCard() {
+  const board = generateBoard(currentSport);
+  const marks = new Set(['2-2']);
+  saveBoard(currentSport, board, Array.from(marks));
+  renderBoard(board, marks);
+}
+
+function changeSport(sport) {
+  currentSport = sport;
+  localStorage.setItem('bingo_sport', sport);
+
+  document.getElementById('title').textContent =
+    sport.charAt(0).toUpperCase() + sport.slice(1) + ' Bingo';
+
+  const { board, marks } = loadBoard(sport);
+  renderBoard(board, marks);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sportParam = urlParams.get('sport');
+  if (sportParam) {
+    currentSport = sportParam;
+    localStorage.setItem('bingo_sport', sportParam);
+  }
+
+  document.getElementById('title').textContent =
+    currentSport.charAt(0).toUpperCase() + currentSport.slice(1) + ' Bingo';
+
+  const { board, marks } = loadBoard(currentSport);
+  renderBoard(board, marks);
+});
+</script>
+</body>
+</html>
