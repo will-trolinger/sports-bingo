@@ -310,6 +310,11 @@ function checkBingo() {
 }
 
 function generateNewCard() {
+  const confirmed = confirm('Generate a new card? Your current board and marks will be lost.');
+  if (!confirmed) {
+    return;
+  }
+
   const board = generateBoard(currentSport);
   const marks = new Set(['2-2']);
   saveBoard(currentSport, board, Array.from(marks));
