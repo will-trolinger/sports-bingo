@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/*
+ * The palette from Ballpark Projector (ballparks.wtrolinger.me): the deep
+ * green of a hand-operated outfield scoreboard, the chalk its numbers are
+ * painted in, and the yellow of a lit lamp. Here yellow means "marked".
+ */
+@theme {
+  --font-sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --color-board: #1d3a2e;
+  --color-slot: #132820;
+  --color-slot-hover: #1a3429;
+  /* A marked square: a shade lighter than the board, as if lit from behind. */
+  --color-slot-lit: #24483a;
+  --color-rule: rgba(242, 241, 234, 0.14);
+  --color-chalk: #f2f1ea;
+  --color-chalk-dim: rgba(242, 241, 234, 0.62);
+  --color-lamp: #f4c430;
+}
+
+html,
+body {
+  background: var(--color-board);
+  color: var(--color-chalk);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The glow of a lit lamp under a marked square's logo. */
+.lamp {
+  box-shadow: 0 0 10px rgba(244, 196, 48, 0.55);
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Keyboard focus in the chalk color rather than the browser's blue. */
+:focus-visible {
+  outline: 2px solid var(--color-chalk);
+  outline-offset: 2px;
+}
