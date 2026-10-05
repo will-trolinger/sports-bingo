@@ -63,7 +63,7 @@ export function App() {
       <button
         type="button"
         onClick={() => setConfirmingNew(true)}
-        className="mt-5 h-11 self-start rounded-md border border-rule px-5 text-sm hover:border-chalk-dim"
+        className="mt-6 h-11 w-full self-center rounded-md border border-rule px-6 text-sm hover:bg-square sm:w-auto"
       >
         Generate New Card
       </button>

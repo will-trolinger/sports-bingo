@@ -8,8 +8,7 @@ interface Props {
   onToggle: (key: string) => void;
 }
 
-// The 5x5 card. A marked square lights a lamp bar under its logo, the same
-// device the ballparks scoreboard uses for "gone".
+// The 5x5 card. A marked square fills with the accent color.
 export function BingoBoard({ sport, board, marks, onToggle }: Props) {
   return (
     <div className="grid grid-cols-5 gap-1.5 sm:gap-2" role="grid" aria-label="Bingo card">
@@ -24,20 +23,19 @@ export function BingoBoard({ sport, board, marks, onToggle }: Props) {
               type="button"
               aria-pressed={marked}
               onClick={() => onToggle(key)}
-              className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-md p-1 transition-colors focus-visible:outline-2 focus-visible:outline-chalk ${
-                marked ? "bg-slot-lit" : "bg-slot hover:bg-slot-hover"
+              className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-md border p-1 transition-colors ${
+                marked ? "border-mark-edge bg-mark" : "border-transparent bg-square hover:bg-square-hover"
               }`}
             >
               <img
                 src={logoUrl(sport, cell.name)}
                 alt=""
-                className={`h-[52%] w-[70%] object-contain transition-opacity ${marked ? "" : "opacity-90"}`}
+                className="h-[55%] w-[70%] object-contain"
                 draggable={false}
               />
-              <span className="w-full truncate text-center text-[10px] leading-tight text-chalk-dim sm:text-xs">
+              <span className="w-full truncate text-center text-[10px] leading-tight text-ink-dim sm:text-xs">
                 {cell.name}
               </span>
-              <span className={`h-1 w-3/5 rounded-full ${marked ? "lamp bg-lamp" : "bg-rule"}`} />
             </button>
           );
         })
@@ -49,10 +47,9 @@ export function BingoBoard({ sport, board, marks, onToggle }: Props) {
 function FreeSquare() {
   return (
     <div
-      className="flex aspect-square flex-col items-center justify-center gap-1 rounded-md bg-slot-lit"
+      className="flex aspect-square items-center justify-center rounded-md border border-mark-edge bg-mark"
     >
-      <span className="text-sm font-semibold tracking-wide text-lamp sm:text-base">FREE</span>
-      <span className="lamp h-1 w-3/5 rounded-full bg-lamp" />
+      <span className="text-sm font-semibold tracking-wide sm:text-base">FREE</span>
     </div>
   );
 }

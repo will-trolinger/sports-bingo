@@ -58,10 +58,8 @@ const ESPN_LEAGUE: Record<Sport, string> = {
   college: "ncaa",
 };
 
-// The "500-dark" set is ESPN's variant drawn for dark backgrounds, which the
-// board is; the standard set has dark marks that vanish on it.
 export function logoUrl(sport: Sport, team: string): string {
-  return `https://a.espncdn.com/i/teamlogos/${ESPN_LEAGUE[sport]}/500-dark/${TEAMS[sport][team]}.png`;
+  return `https://a.espncdn.com/i/teamlogos/${ESPN_LEAGUE[sport]}/500/${TEAMS[sport][team]}.png`;
 }
 
 export function isSport(value: string | null): value is Sport {

@@ -25,15 +25,15 @@ export function ConfirmDialog({ open, title, body, confirmLabel, onConfirm, onCa
     <dialog
       ref={ref}
       onCancel={onCancel}
-      className="m-auto w-[min(400px,calc(100vw-2rem))] rounded-lg border border-rule bg-board p-5 text-chalk"
+      className="m-auto w-[min(400px,calc(100vw-2rem))] rounded-lg border border-rule bg-page p-5 text-ink shadow-xl"
     >
       <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="mt-2 text-sm text-chalk-dim">{body}</p>
+      <p className="mt-2 text-sm text-ink-dim">{body}</p>
       <div className="mt-5 flex justify-end gap-2">
-        <button type="button" onClick={onCancel} className="h-10 rounded-md px-4 text-sm text-chalk-dim hover:text-chalk">
+        <button type="button" onClick={onCancel} className="h-10 rounded-md px-4 text-sm text-ink-dim hover:text-ink">
           Cancel
         </button>
-        <button type="button" onClick={onConfirm} className="h-10 rounded-md bg-chalk px-4 text-sm font-semibold text-board">
+        <button type="button" onClick={onConfirm} className="h-10 rounded-md bg-ink px-4 text-sm font-semibold text-page">
           {confirmLabel}
         </button>
       </div>
