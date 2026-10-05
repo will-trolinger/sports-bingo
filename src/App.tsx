@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { AccountDialog } from "./components/AccountDialog";
+import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import { WelcomeDialog } from "./components/WelcomeDialog";
 import { BoardPage } from "./pages/BoardPage";
@@ -29,7 +30,7 @@ function Layout() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-xl flex-col px-4 pb-10">
+    <div className="mx-auto flex min-h-dvh max-w-xl flex-col px-4 pb-6">
       <Header account={account} loaded={loaded} onLogIn={() => setAccountKind("login")} />
       <Routes>
         <Route path="/" element={<GamePage loggedIn={account !== null} onSaved={refresh} />} />
@@ -39,6 +40,10 @@ function Layout() {
         />
         <Route path="/history/:id" element={<BoardPage onDeleted={refresh} />} />
       </Routes>
+      {/* Space above the footer even when a page is long enough to push it down. */}
+      <div className="mt-auto pt-10">
+        <Footer />
+      </div>
       <WelcomeDialog open={showWelcome} onGuest={() => finishWelcome(null)} onAccount={finishWelcome} />
       <AccountDialog
         open={accountKind !== null}
