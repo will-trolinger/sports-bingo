@@ -3,6 +3,15 @@ import { generateBoard } from "../src/board";
 
 export const ORIGIN = "https://bingo.test";
 
+// Each test gets its own client IP, so the per-IP sign-up limit (10 a
+// minute) is counted per test rather than across a whole file.
+let clientIp = "203.0.113.0";
+let ipCounter = 0;
+export function useFreshClientIp(): void {
+  ipCounter += 1;
+  clientIp = `203.0.${Math.floor(ipCounter / 250)}.${ipCounter % 250}`;
+}
+
 interface Options {
   method?: string;
   body?: unknown;
@@ -12,7 +21,7 @@ interface Options {
 
 // Calls the Worker the way a browser on this site would: same origin, JSON.
 export function call(path: string, { method = "GET", body, cookie, origin = ORIGIN }: Options = {}) {
-  const headers: Record<string, string> = { origin };
+  const headers: Record<string, string> = { origin, "cf-connecting-ip": clientIp };
   if (body !== undefined) headers["content-type"] = "application/json";
   if (cookie) headers.cookie = cookie;
   return exports.default.fetch(`${ORIGIN}${path}`, {

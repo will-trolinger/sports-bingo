@@ -22,8 +22,10 @@ describe("accounts", () => {
   it("rejects a bad username or a short password", async () => {
     const badName = await call("/api/auth/signup", { method: "POST", body: { username: "a b", password: "long enough" } });
     expect(badName.status).toBe(400);
-    const shortPassword = await call("/api/auth/signup", { method: "POST", body: { username: "will", password: "short" } });
+    const shortPassword = await call("/api/auth/signup", { method: "POST", body: { username: "will", password: "five5" } });
     expect(shortPassword.status).toBe(400);
+    const sixIsEnough = await call("/api/auth/signup", { method: "POST", body: { username: "will", password: "six666" } });
+    expect(sixIsEnough.status).toBe(201);
   });
 
   it("logs in with the right password only", async () => {
@@ -52,5 +54,13 @@ describe("accounts", () => {
       body: { username: "will", password: "correct horse" },
     });
     expect(res.status).toBe(403);
+  });
+
+  it("limits sign-up and log-in attempts from one address", async () => {
+    const attempt = () => call("/api/auth/login", { method: "POST", body: { username: "nobody", password: "wrong guess" } });
+    const statuses = [];
+    for (let i = 0; i < 11; i++) statuses.push((await attempt()).status);
+    expect(statuses.slice(0, 10).every((status) => status === 401)).toBe(true);
+    expect(statuses[10]).toBe(429);
   });
 });

@@ -4,7 +4,7 @@ import { endSession, findUser, startSession } from "./session";
 import type { AppEnv } from "./types";
 
 const USERNAME = /^[A-Za-z0-9_-]{3,20}$/;
-const MIN_PASSWORD = 8;
+const MIN_PASSWORD = 6;
 const MAX_PASSWORD = 200;
 
 interface Credentials {

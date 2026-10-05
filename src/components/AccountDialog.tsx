@@ -86,7 +86,7 @@ export function AccountDialog({ open, initialKind, onClose, onSubmit }: Props) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete={kind === "login" ? "current-password" : "new-password"}
-            minLength={kind === "signup" ? 8 : undefined}
+            minLength={kind === "signup" ? 6 : undefined}
             required
           />
         </label>
