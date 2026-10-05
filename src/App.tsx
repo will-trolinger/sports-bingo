@@ -1,81 +1,42 @@
 import { useState } from "react";
-import confetti from "canvas-confetti";
-import { completedLines } from "./board";
-import { BingoBoard } from "./components/BingoBoard";
-import { ConfirmDialog } from "./components/ConfirmDialog";
-import { SportPicker } from "./components/SportPicker";
-import { loadGame, loadSport, newGame, saveGame, saveSport, type Game } from "./storage";
-import { isSport, SPORTS, type Sport } from "./teams";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { AccountDialog } from "./components/AccountDialog";
+import { Header } from "./components/Header";
+import { BoardPage } from "./pages/BoardPage";
+import { GamePage } from "./pages/GamePage";
+import { HistoryPage } from "./pages/HistoryPage";
+import { useAccount } from "./useAccount";
 
-// A ?sport= link (the original app supported these) picks the board to open.
-function initialSport(): Sport {
-  const param = new URLSearchParams(window.location.search).get("sport");
-  if (isSport(param)) {
-    saveSport(param);
-    return param;
-  }
-  return loadSport();
-}
+function Layout() {
+  const { account, loaded, refresh, enter, leave } = useAccount();
+  const [loggingIn, setLoggingIn] = useState(false);
+  const navigate = useNavigate();
 
-function celebrate(): void {
-  confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-}
-
-export function App() {
-  const [sport, setSport] = useState<Sport>(initialSport);
-  const [game, setGame] = useState<Game>(() => loadGame(sport));
-  const [confirmingNew, setConfirmingNew] = useState(false);
-  const label = SPORTS.find((s) => s.id === sport)?.label ?? "";
-
-  function changeSport(next: Sport) {
-    saveSport(next);
-    setSport(next);
-    setGame(loadGame(next));
-  }
-
-  function toggle(key: string) {
-    const marks = new Set(game.marks);
-    if (marks.has(key)) marks.delete(key);
-    else marks.add(key);
-    const next = { board: game.board, marks };
-    saveGame(sport, next);
-    setGame(next);
-    // Celebrate each newly completed line, not every tap while one stands.
-    if (completedLines(marks).length > completedLines(game.marks).length) celebrate();
-  }
-
-  function startNewCard() {
-    setGame(newGame(sport));
-    setConfirmingNew(false);
+  async function logOut() {
+    await leave();
+    navigate("/");
   }
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-xl flex-col px-4 pb-10">
-      <header className="flex flex-wrap items-center justify-between gap-3 py-5">
-        <span className="font-semibold">Sports Bingo</span>
-        <SportPicker sport={sport} onChange={changeSport} />
-      </header>
-
-      <h1 className="mb-4 text-4xl font-light sm:text-5xl">{label} Bingo</h1>
-
-      <BingoBoard sport={sport} board={game.board} marks={game.marks} onToggle={toggle} />
-
-      <button
-        type="button"
-        onClick={() => setConfirmingNew(true)}
-        className="mt-6 h-11 w-full self-center rounded-md border border-rule px-6 text-sm hover:bg-square sm:w-auto"
-      >
-        Generate New Card
-      </button>
-
-      <ConfirmDialog
-        open={confirmingNew}
-        title="Generate a new card?"
-        body="Your current board and marks will be lost."
-        confirmLabel="New card"
-        onConfirm={startNewCard}
-        onCancel={() => setConfirmingNew(false)}
-      />
+      <Header account={account} loaded={loaded} onLogIn={() => setLoggingIn(true)} />
+      <Routes>
+        <Route path="/" element={<GamePage loggedIn={account !== null} onSaved={refresh} />} />
+        <Route
+          path="/history"
+          element={<HistoryPage account={account} onLogIn={() => setLoggingIn(true)} onLogOut={logOut} />}
+        />
+        <Route path="/history/:id" element={<BoardPage />} />
+      </Routes>
+      <AccountDialog open={loggingIn} onClose={() => setLoggingIn(false)} onSubmit={enter} />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
   );
 }

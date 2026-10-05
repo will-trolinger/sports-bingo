@@ -34,13 +34,15 @@ describe("accounts", () => {
     expect(unknown.status).toBe(401);
     const right = await call("/api/auth/login", { method: "POST", body: { username: "WILL", password: "correct horse" } });
     expect(right.status).toBe(200);
-    expect((await call("/api/me", { cookie: sessionCookie(right) })).status).toBe(200);
+    expect(((await (await call("/api/me", { cookie: sessionCookie(right) })).json()) as { user: unknown }).user).toEqual({
+      username: "will",
+    });
   });
 
   it("ends the session on logout", async () => {
     const cookie = await signUp();
     expect((await call("/api/auth/logout", { method: "POST", cookie })).status).toBe(204);
-    expect((await call("/api/me", { cookie })).status).toBe(401);
+    expect(await (await call("/api/me", { cookie })).json()).toEqual({ user: null, stats: null });
   });
 
   it("refuses requests from another site", async () => {

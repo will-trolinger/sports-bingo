@@ -1,4 +1,5 @@
 import { FREE_KEY, generateBoard, type Board } from "./board";
+import type { Mode } from "./api";
 import { isSport, type Sport } from "./teams";
 
 // The keys the original single-file app used, kept so a board in progress
@@ -6,10 +7,16 @@ import { isSport, type Sport } from "./teams";
 const SPORT_KEY = "bingo_sport";
 const boardKey = (sport: Sport) => `bingo_board_${sport}`;
 const marksKey = (sport: Sport) => `bingo_marks_${sport}`;
+// Added with accounts: which saved board this card mirrors (none for a
+// guest) and whether the player chose to go for blackout.
+const idKey = (sport: Sport) => `bingo_id_${sport}`;
+const modeKey = (sport: Sport) => `bingo_mode_${sport}`;
 
 export interface Game {
   board: Board;
   marks: ReadonlySet<string>;
+  id: string | null;
+  mode: Mode;
 }
 
 // Storage can throw (private windows, blocked site data), and a game that
@@ -53,10 +60,12 @@ function parseMarks(raw: string | null): Set<string> | null {
 export function saveGame(sport: Sport, game: Game): void {
   write(boardKey(sport), JSON.stringify(game.board));
   write(marksKey(sport), JSON.stringify([...game.marks]));
+  write(idKey(sport), game.id ?? "");
+  write(modeKey(sport), game.mode);
 }
 
 export function newGame(sport: Sport): Game {
-  const game = { board: generateBoard(sport), marks: new Set([FREE_KEY]) };
+  const game: Game = { board: generateBoard(sport), marks: new Set([FREE_KEY]), id: null, mode: "playing" };
   saveGame(sport, game);
   return game;
 }
@@ -64,7 +73,9 @@ export function newGame(sport: Sport): Game {
 export function loadGame(sport: Sport): Game {
   const board = parseBoard(read(boardKey(sport)));
   const marks = parseMarks(read(marksKey(sport)));
-  return board && marks ? { board, marks } : newGame(sport);
+  if (!board || !marks) return newGame(sport);
+  const mode = read(modeKey(sport)) === "blackout" ? "blackout" : "playing";
+  return { board, marks, id: read(idKey(sport)) || null, mode };
 }
 
 export function loadSport(): Sport {

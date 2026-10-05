@@ -11,6 +11,8 @@ describe("storage", () => {
     localStorage.setItem("bingo_marks_baseball", JSON.stringify(["2-2", "0-1"]));
     const game = loadGame("baseball");
     expect(game.board).toEqual(board);
+    expect(game.id).toBeNull();
+    expect(game.mode).toBe("playing");
     expect([...game.marks].sort()).toEqual(["0-1", "2-2"]);
   });
 
@@ -22,8 +24,11 @@ describe("storage", () => {
 
   it("round-trips a game and the chosen sport", () => {
     const game = loadGame("college");
-    saveGame("college", { board: game.board, marks: new Set([FREE_KEY, "1-1"]) });
-    expect(loadGame("college").marks).toEqual(new Set([FREE_KEY, "1-1"]));
+    saveGame("college", { board: game.board, marks: new Set([FREE_KEY, "1-1"]), id: "abc", mode: "blackout" });
+    const loaded = loadGame("college");
+    expect(loaded.marks).toEqual(new Set([FREE_KEY, "1-1"]));
+    expect(loaded.id).toBe("abc");
+    expect(loaded.mode).toBe("blackout");
     saveSport("college");
     expect(loadSport()).toBe("college");
   });

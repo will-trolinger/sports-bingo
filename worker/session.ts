@@ -48,7 +48,7 @@ export async function endSession(c: Context<AppEnv>): Promise<void> {
   deleteCookie(c, COOKIE, { path: "/" });
 }
 
-async function findUser(c: Context<AppEnv>): Promise<User | null> {
+export async function findUser(c: Context<AppEnv>): Promise<User | null> {
   const token = getCookie(c, COOKIE);
   if (!token) return null;
   const tokenHash = await hashToken(token);

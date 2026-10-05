@@ -1,6 +1,6 @@
 import { Hono, type Context } from "hono";
 import { hashPassword, verifyPassword } from "./password";
-import { endSession, requireUser, startSession } from "./session";
+import { endSession, findUser, startSession } from "./session";
 import type { AppEnv } from "./types";
 
 const USERNAME = /^[A-Za-z0-9_-]{3,20}$/;
@@ -66,8 +66,10 @@ authRoutes.post("/auth/logout", async (c) => {
   return c.body(null, 204);
 });
 
-authRoutes.get("/me", requireUser, async (c) => {
-  const user = c.get("user");
+// Who is logged in. A guest is a normal answer here, not an error.
+authRoutes.get("/me", async (c) => {
+  const user = await findUser(c);
+  if (!user) return c.json({ user: null, stats: null });
   const stats = await c.env.DB.prepare(
     "SELECT COALESCE(SUM(has_bingo), 0) AS bingos, COALESCE(SUM(is_blackout), 0) AS blackouts FROM boards WHERE user_id = ?"
   )
