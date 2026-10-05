@@ -86,3 +86,14 @@ export function loadSport(): Sport {
 export function saveSport(sport: Sport): void {
   write(SPORT_KEY, sport);
 }
+
+// Whether this browser has seen the first-visit welcome.
+const WELCOMED_KEY = "bingo_welcomed";
+
+export function hasBeenWelcomed(): boolean {
+  return read(WELCOMED_KEY) === "1";
+}
+
+export function markWelcomed(): void {
+  write(WELCOMED_KEY, "1");
+}

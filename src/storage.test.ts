@@ -39,3 +39,12 @@ describe("storage", () => {
     expect(loadGame("baseball").board).toHaveLength(5);
   });
 });
+
+describe("first-visit welcome", () => {
+  it("is remembered once seen", async () => {
+    const { hasBeenWelcomed, markWelcomed } = await import("./storage");
+    expect(hasBeenWelcomed()).toBe(false);
+    markWelcomed();
+    expect(hasBeenWelcomed()).toBe(true);
+  });
+});

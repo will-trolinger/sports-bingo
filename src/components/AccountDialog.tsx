@@ -1,10 +1,12 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Modal, primaryButton } from "./Modal";
 
 type Kind = "login" | "signup";
 
 interface Props {
   open: boolean;
+  // Which tab to open on: sign-up when the player asked to make an account.
+  initialKind: Kind;
   onClose: () => void;
   onSubmit: (kind: Kind, username: string, password: string) => Promise<void>;
 }
@@ -13,12 +15,19 @@ interface Props {
 const input =
   "h-12 w-full rounded-md border border-rule bg-page px-3 text-base outline-none focus:border-ink";
 
-export function AccountDialog({ open, onClose, onSubmit }: Props) {
-  const [kind, setKind] = useState<Kind>("login");
+export function AccountDialog({ open, initialKind, onClose, onSubmit }: Props) {
+  const [kind, setKind] = useState<Kind>(initialKind);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setKind(initialKind);
+      setError(null);
+    }
+  }, [open, initialKind]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
