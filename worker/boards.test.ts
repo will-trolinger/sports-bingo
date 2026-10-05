@@ -87,4 +87,24 @@ describe("boards", () => {
     const board = await newBoard(cookie);
     expect((await mark(cookie, board.id, ["9-9"])).status).toBe(400);
   });
+
+  it("deletes a player's own board and drops it from history and the count", async () => {
+    const cookie = await signUp();
+    const board = await newBoard(cookie);
+    await mark(cookie, board.id, TOP_ROW);
+    expect((await call(`/api/boards/${board.id}`, { method: "DELETE", cookie })).status).toBe(204);
+    expect((await call(`/api/boards/${board.id}`, { cookie })).status).toBe(404);
+    const history = (await (await call("/api/boards", { cookie })).json()) as { boards: unknown[] };
+    expect(history.boards).toEqual([]);
+    expect(await stats(cookie)).toEqual({ bingos: 0, blackouts: 0 });
+  });
+
+  it("will not delete another player's board", async () => {
+    const owner = await signUp("owner");
+    const board = await newBoard(owner);
+    const other = await signUp("other");
+    expect((await call(`/api/boards/${board.id}`, { method: "DELETE", cookie: other })).status).toBe(404);
+    expect((await call(`/api/boards/${board.id}`, { cookie: owner })).status).toBe(200);
+    expect((await call(`/api/boards/${board.id}`, { method: "DELETE" })).status).toBe(401);
+  });
 });

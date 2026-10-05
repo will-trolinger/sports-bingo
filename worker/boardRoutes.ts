@@ -89,3 +89,12 @@ boardRoutes.put("/boards/:id", async (c) => {
     .run();
   return c.json({ board: toApiBoard((await ownBoard(c, row.id))!) });
 });
+
+// Removes one of the player's own boards, whether finished or in play.
+boardRoutes.delete("/boards/:id", async (c) => {
+  const result = await c.env.DB.prepare("DELETE FROM boards WHERE id = ? AND user_id = ?")
+    .bind(c.req.param("id"), c.get("user").id)
+    .run();
+  if (result.meta.changes === 0) return c.json({ error: "No such board." }, 404);
+  return c.body(null, 204);
+});

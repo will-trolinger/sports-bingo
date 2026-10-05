@@ -24,8 +24,11 @@ export function HistoryPage({ account, onLogIn, onLogOut }: Props) {
 
   if (!account) {
     return (
-      <div className="mt-6">
-        <h1 className="text-4xl font-light">My bingos</h1>
+      <div className="mt-2">
+      <Link to="/" className="-ml-1 inline-flex h-11 items-center px-1 text-sm text-ink-dim hover:text-ink">
+        ‹ Back to my card
+      </Link>
+        <h1 className="mt-1 text-4xl font-light">My bingos</h1>
         <p className="mt-3 text-ink-dim">Log in to see the bingos you've saved.</p>
         <button type="button" onClick={onLogIn} className="mt-5 h-11 w-full rounded-md bg-ink px-5 text-sm font-semibold text-page sm:w-auto">
           Log in
@@ -37,7 +40,10 @@ export function HistoryPage({ account, onLogIn, onLogOut }: Props) {
   const { bingos, blackouts } = account.stats;
   return (
     <div className="mt-2">
-      <h1 className="text-4xl font-light">My bingos</h1>
+      <Link to="/" className="-ml-1 inline-flex h-11 items-center px-1 text-sm text-ink-dim hover:text-ink">
+        ‹ Back to my card
+      </Link>
+      <h1 className="mt-1 text-4xl font-light">My bingos</h1>
       <p className="mt-2 text-ink-dim">
         {account.user.username} · {plural(bingos, "bingo")}
         {blackouts > 0 && ` · ${plural(blackouts, "blackout")}`}

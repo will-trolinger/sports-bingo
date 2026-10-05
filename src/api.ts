@@ -88,3 +88,5 @@ export function updateBoardOnExit(id: string, marks: string[], mode: Mode): void
 export const fetchHistory = () => request<{ boards: SavedBoard[] }>("/boards").then((r) => r.boards);
 
 export const fetchBoard = (id: string) => request<{ board: SavedBoard }>(`/boards/${id}`).then((r) => r.board);
+
+export const deleteBoard = (id: string) => request<void>(`/boards/${id}`, send("DELETE"));

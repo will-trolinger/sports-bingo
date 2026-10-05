@@ -37,7 +37,7 @@ function Layout() {
           path="/history"
           element={<HistoryPage account={account} onLogIn={() => setAccountKind("login")} onLogOut={logOut} />}
         />
-        <Route path="/history/:id" element={<BoardPage />} />
+        <Route path="/history/:id" element={<BoardPage onDeleted={refresh} />} />
       </Routes>
       <WelcomeDialog open={showWelcome} onGuest={() => finishWelcome(null)} onAccount={finishWelcome} />
       <AccountDialog
