@@ -107,11 +107,17 @@ export function useGame(sport: Sport, loggedIn: boolean, onSaved: () => void) {
       else marks.add(key);
       const outcome = outcomeOfToggle(before.marks, marks, before.mode);
       show({ ...before, marks });
-      schedule();
+      // A new line or a blackout saves at once: the popup says it is saved.
+      if (outcome.celebrate) {
+        dirty.current = true;
+        void flush();
+      } else {
+        schedule();
+      }
       if (outcome.celebrate) celebrate();
       if (outcome.prompt) setPrompt(outcome.prompt);
     },
-    [show, schedule]
+    [show, schedule, flush]
   );
 
   const goForBlackout = useCallback(() => {

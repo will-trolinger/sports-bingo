@@ -3,6 +3,9 @@
   "name": "sports-bingo",
   "main": "worker/index.ts",
   "compatibility_date": "2026-08-22",
+  // Served only at the custom domain, not also at a workers.dev address.
+  "workers_dev": false,
+  "routes": [{ "pattern": "bingo.wtrolinger.me", "custom_domain": true }],
   // The built client is served as static assets; only /api reaches the
   // Worker. Any other path falls back to index.html so client routes such
   // as /history load on a refresh.
@@ -15,9 +18,9 @@
     {
       "binding": "DB",
       "database_name": "sports-bingo",
-      // Replaced with the real id when the database is created for deploy;
-      // local development and tests use a local copy keyed by this.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      // The production database on Will's personal Cloudflare account; local
+      // development and tests use their own local copy.
+      "database_id": "3734b694-74cf-4960-9874-c19f6b69d835",
       "migrations_dir": "migrations"
     }
   ],
