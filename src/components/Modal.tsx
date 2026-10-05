@@ -14,7 +14,12 @@ export function Modal({ open, onClose, children }: Props) {
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // Opening focuses the first button by default; a dialog that marks a
+      // field (the username box) starts there instead.
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 

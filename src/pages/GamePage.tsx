@@ -35,10 +35,12 @@ export function GamePage({ loggedIn, onSaved }: Props) {
 
   return (
     <>
+      {/* The switch already shows the sport; the heading is for screen readers. */}
+      <h1 className="sr-only">{sportLabel(sport)} Bingo</h1>
       <SportPicker sport={sport} onChange={changeSport} />
-      <h1 className="mt-5 mb-4 text-4xl font-light sm:text-5xl">{sportLabel(sport)} Bingo</h1>
-
-      <BingoBoard sport={sport} board={game.board} marks={game.marks} onToggle={toggle} />
+      <div className="mt-4">
+        <BingoBoard sport={sport} board={game.board} marks={game.marks} onToggle={toggle} />
+      </div>
 
       <button
         type="button"

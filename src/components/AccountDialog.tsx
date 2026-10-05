@@ -57,7 +57,7 @@ export function AccountDialog({ open, initialKind, onClose, onSubmit }: Props) {
               setKind(k);
               setError(null);
             }}
-            className={`h-10 flex-1 text-sm ${kind === k ? "bg-ink font-semibold text-page" : "text-ink-dim"}`}
+            className={`h-10 flex-1 text-sm focus-visible:-outline-offset-2 ${kind === k ? "bg-ink font-semibold text-page" : "text-ink-dim"}`}
           >
             {k === "login" ? "Log in" : "Sign up"}
           </button>
@@ -71,6 +71,7 @@ export function AccountDialog({ open, initialKind, onClose, onSubmit }: Props) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             autoComplete="username"
+            data-autofocus
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}

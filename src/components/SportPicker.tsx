@@ -16,7 +16,7 @@ export function SportPicker({ sport, onChange }: Props) {
           type="button"
           aria-pressed={sport === id}
           onClick={() => onChange(id)}
-          className={`h-10 flex-1 px-4 text-sm transition-colors ${
+          className={`h-10 flex-1 px-4 text-sm transition-colors focus-visible:-outline-offset-2 ${
             sport === id ? "bg-ink font-semibold text-page" : "text-ink-dim hover:text-ink"
           }`}
         >
