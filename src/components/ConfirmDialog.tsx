@@ -15,7 +15,7 @@ export function ConfirmDialog({ open, title, body, confirmLabel, onConfirm, onCa
       <h2 className="text-lg font-semibold">{title}</h2>
       <p className="mt-2 text-sm text-ink-dim">{body}</p>
       <div className="mt-5 flex justify-end gap-2">
-        <button type="button" onClick={onCancel} className="h-11 rounded-md px-4 text-sm text-ink-dim hover:text-ink">
+        <button type="button" onClick={onCancel} className="h-11 rounded-md px-4 text-sm text-ink-dim hover:text-ink" data-autofocus>
           Cancel
         </button>
         <button type="button" onClick={onConfirm} className={primaryButton}>

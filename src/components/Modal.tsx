@@ -6,8 +6,10 @@ interface Props {
   children: ReactNode;
 }
 
-// The browser's native <dialog>: it traps focus, closes on Escape and sits
-// above the page without a library. Near full width on a phone.
+// The browser's native <dialog>: it traps focus and sits above the page
+// without a library. Near full width on a phone. It closes on Escape, on the
+// close button, or on a tap outside it, so no dialog can trap a player who
+// has no keyboard.
 export function Modal({ open, onClose, children }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -16,8 +18,9 @@ export function Modal({ open, onClose, children }: Props) {
     if (!dialog) return;
     if (open && !dialog.open) {
       dialog.showModal();
-      // Opening focuses the first button by default; a dialog that marks a
-      // field (the username box) starts there instead.
+      // Opening would focus the close button (the first one); each dialog
+      // marks where it should start instead: its main choice, or the
+      // username box.
       dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
     }
     if (!open && dialog.open) dialog.close();
@@ -30,9 +33,28 @@ export function Modal({ open, onClose, children }: Props) {
         event.preventDefault();
         onClose();
       }}
-      className="m-auto w-[min(400px,calc(100vw-2rem))] rounded-xl border border-rule bg-page p-5 text-ink shadow-xl"
+      // The content sits in an inner box, so a click that lands on the
+      // dialog element itself can only be on the backdrop around it.
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+      className="m-auto w-[min(400px,calc(100vw-2rem))] rounded-xl border border-rule bg-page p-0 text-ink shadow-xl"
     >
-      {open && children}
+      {open && (
+        <div className="relative px-5 pt-12 pb-5">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute top-1.5 right-1.5 grid size-11 place-items-center rounded-full text-ink-dim hover:bg-square hover:text-ink"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+          {children}
+        </div>
+      )}
     </dialog>
   );
 }

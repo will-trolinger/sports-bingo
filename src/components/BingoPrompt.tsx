@@ -16,7 +16,7 @@ export function BingoPrompt({ kind, loggedIn, onNewCard, onBlackout, onClose }: 
       <h2 className="text-2xl font-semibold">{kind === "blackout" ? "Blackout!" : "Bingo!"}</h2>
       <p className="mt-2 text-sm text-ink-dim">{saved}</p>
       <div className="mt-5 flex flex-col gap-2">
-        <button type="button" onClick={onNewCard} className={primaryButton}>
+        <button type="button" onClick={onNewCard} className={primaryButton} data-autofocus>
           Start a new card
         </button>
         {kind === "bingo" ? (
